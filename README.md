@@ -134,40 +134,15 @@ model:
 
 
 ### 3. 使用预训练数据（底模）进行训练：
-1. 欢迎PR训练的多人底模 (请使用授权同意开源的数据集进行训练)。
-2. 预训练模型见上文,需要特别注意使用的是相同编码器的模型。
+1. 欢迎PR训练的底模 (请使用授权同意开源的数据集进行训练)。
+2. 预训练模型需要特别注意使用的是相同编码器的模型。
 3. 将名为`model_0.pt`的预训练模型, 放到`config.yaml`里面 "expdir: exp/*****" 参数指定的模型导出文件夹内, 没有就新建一个, 程序会自动加载该文件夹下的预训练模型。
 4. 同不使用预训练数据进行训练一样，启动训练。
 
-### 4.我们提供的与训练模型
+### 4.我们提供的预训练模型
 看todo
-## 4.1. Naive模型与组合模型
-### Naive模型
-Naive模型是一个轻量级的svc模型，可以作为浅扩散的前级，训练方式与扩散模型一致，示例配置文件在`configs/config_naive.yaml`。其所需的预处理和扩散模型是一样的。
-```bash
-python train.py -c configs/config_naive.yaml
-```
-推理时使用`-nmodel`指向模型文件以使用，此时必须要浅扩散深度`-kstep`。
 
-### 组合模型
-使用`combo.py`可以将一个扩散模型和一个naive模型组合为一个combo模型，只需此模型就能实现浅扩散。这两个模型需要使用同样的参数训练(如同样的说话人id)，因为推理时他们也使用同样的参数推理。
-```bash
-python combo.py -model <model> -nmodel <nmodel> -exp <exp> -n <name>
-```
-使用以上命令将两个模型组合。其中`-model`是扩散模型的路径，`-nmodel`是naive模型的路径；与模型同目录下的配置文件也会自动读取。`-exp`是输出组合模型的目录，`-n`是保存的组合模型名。上述命令会在`<exp>`下输出组合模型为`<name>.ptc`。
-
-组合模型可直接在推理时作为扩散模型被正确加载用于浅扩散，而无需额外输入`-nmodel`来加载naive模型。
-
-## 4.2. 关于k_step_max与浅扩散
-***(示意图见readme开头)***
-
-浅扩散过程中，扩散模型只从一定加噪深度开始扩散，而无需从高斯噪声开始。因此，在浅扩散用途下扩散模型也可以只训练一定加噪深度而不用从高斯噪声开始。
-
-配置文件中指定`k_step_max`为扩散深度就是进行这样的训练，该值必须小于1000(这是完整扩散的步数)。这样训练的模型不能单独推理，必须在前级模型的输出结果上或输入源上进行浅扩散；扩散的最大深度不能超过`k_step_max`。
-
-示例配置文件见`configs/config_shallow.yaml`。
-
-推荐将这种只能浅扩散的扩散模型与naive模型组合为组合模型使用。
+### 4.1 不同配置文件的特性解释
 
 ## 5. 可视化
 ```bash
@@ -188,22 +163,15 @@ python main.py -i <input.wav> -model <model_ckpt.pt> -o <output.wav> -k <keychan
 
 `-pe` 可选项为 `crepe` `parselmouth` `dio` `harvest` `rmvpe` 默认 `crepe`  
 
-~~如果使用了声纹编码，那么可以通过`-spkemb`指定一个外部声纹，或者通过`-spkembdict`覆盖模型模型的声纹词典。~~
 
-## 7. Units索引(可选,不推荐)
-与[RVC](https://github.com/RVC-Project/Retrieval-based-Voice-Conversion-WebUI)和[so-vits-svc](https://github.com/svc-develop-team/so-vits-svc)类似的特征索引。
 
-**注意，此为可选功能，无索引也可正常使用，索引会占用大量存储空间，索引时还会大量占用CPU，此功能不推荐使用。**
-```bash
-# 训练特征索引，需要先完成预处理
-python train_units_index.py -c config.yaml
-```
-推理时，使用`-lr`参数使用。此参数为检索比率。
+
+
 
 ## 8. 实时推理
-推荐使用本仓库自带的GUI进行实时推理，如果需要使用浅扩散请先组合模型。
+推荐使用本仓库自带的GUI进行实时推理
 ```bash
-python gui_realtime.py
+python gui_realtime_reflow.py
 ```
 
 本项目也可配合[rtvc](https://github.com/fishaudio/realtime-vc-gui)实现实时推理。
