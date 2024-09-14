@@ -33,8 +33,8 @@ pip install -r requirements.txt
 ```
 经过测试，项目可以在Python3.8+cu118或者Python+cu121正常运行
 ## 2. 配置预训练模型
-- **(必要操作)** 下载预训练特征提取编码器并将其放到 `pretrain` 文件夹。
-  - 注意：也可以使用别的特征提取，但仍然优先推荐ContentVec。支持的所有特征提取见`tools/tools.py`中的`Units_Encoder`类。下载链接见后文。
+- **(必要操作)** 下载预训练特征提取编码器并将其放到 `pretrain` 文件夹。 [ContentVec](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr) 或者由[svc-develop-team](https://github.com/svc-develop-team/contentvec_test) 提供的优化版ContentVec并将其放到 `pretrain/contentvec` 文件夹。
+  - 注意：也可以使用别的特征提取，但仍然优先推荐ContentVec。支持的所有特征提取见`tools/tools.py`中的`Units_Encoder`类。
 - **(必要操作)** 从 [DiffSinger 社区声码器项目](https://openvpi.github.io/vocoders) 或者[Kouon-Vocoder 社区声码器项目](https://github.com/Kouon-Vocoder-Project)下载预训练声码器，并解压至 `pretrain/` 文件夹。
   -  注意：你应当下载名称中带有`nsf_hifigan`的压缩文件，而非`nsf_hifigan_finetune`。
 - **(可选操作)**  从 [RMVPE](https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip) 下载预训练rmvpe提取器并解压至 `pretrain/` 文件夹
@@ -131,34 +131,7 @@ model:
 数据过差的话可能会炸
 ****
 
-### 2.1 训练完整过程的扩散预训练模型 
-（注意：whisper-ppg对应whisper的medium权重，whisper-ppg-large对应whisper的large-v2权重）
-| Units Encoder                                                                                                                                               | 网络大小   | 数据集                                        | 下载                                                                                                  |
-|-------------------------------------------------------------------------------------------------------------------------------------------------------------|--------|--------------------------------------------|-----------------------------------------------------------------------------------------------------|
-| [contentvec768l12(推荐)](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr)                                                                          | 512*20 | VCTK<br/>m4singer                          | [HuggingFace](https://huggingface.co/ChiTu/Diffusion-SVC/resolve/main/v0.1/contentvec768l12.7z)     |
-| [hubertsoft](https://github.com/bshall/hubert/releases/download/v0.1/hubert-soft-0d54a1f4.pt)                                                               | 512*20 | VCTK<br/>m4singer                          | [HuggingFace](https://huggingface.co/ChiTu/Diffusion-SVC/resolve/main/v0.1/hubertsoft.7z)           |
-| [whisper-ppg(仅支持sovits)](https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt) | 512*20 | VCTK<br/>m4singer<br/>opencpop<br/>kiritan | [HuggingFace](https://huggingface.co/Kakaru/sovits-whisper-pretrain/blob/main/diffusion/model_0.pt) |
 
-补充一个用contentvec768l12编码的整活底模，数据集为`m4singer`/`opencpop`/`vctk`，不推荐使用，不保证没问题：[下载](https://huggingface.co/ChiTu/Diffusion-SVC/resolve/main/v0.1/contentvec768l12%2Bmakefunny.7z)。
-
-### 2.2 只训练k_step_max深度的扩散预训练模型 
-（注意：whisper-ppg对应whisper的medium权重，whisper-ppg-large对应whisper的large-v2权重）
-| 所用编码器                                                                          | 网络大小   | k_step_max | 数据集               | 浅扩散模型下载                                                                                                                                       |
-|--------------------------------------------------------------------------------|--------|------------|-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| [contentvec768l12](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr) | 512*30 | 100        | VCTK<br/>m4singer | [HuggingFace](https://huggingface.co/datasets/ms903/Diff-SVC-refactor-pre-trained-model/resolve/main/Diffusion-SVC/shallow_512_30/model_0.pt) |
-| [contentvec768l12](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr) | 512*20 | 200        | VCTK<br/>m4singer | [HuggingFace](https://huggingface.co/datasets/ms903/Diff-SVC-refactor-pre-trained-model/resolve/main/Diffusion-SVC/shallow_512_20/model_0.pt) |
-| [contentvec256l9](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr) | 512*20 | 200        | VCTK<br/>m4singer | [HuggingFace](https://huggingface.co/OOPPEENN/Diffusion-SVC-pretrained-models/resolve/main/vec256l9_vol_51220_k200.zip) |
-| [contentvec256l9](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr) | 768*30 | 200        | VCTK<br/>m4singer | [HuggingFace](https://huggingface.co/OOPPEENN/Diffusion-SVC-pretrained-models/resolve/main/vec256l9_vol_76830_k200.zip) |
-| [whisper-ppg(仅支持sovits)](https://openaipublic.azureedge.net/main/whisper/models/345ae4da62f9b3d59415adc60127b97c714f32e89e936602e85993674d08dcb1/medium.pt) | 768*30 | 200        | PTDB<br/>m4singer | [HuggingFace](https://huggingface.co/OOPPEENN/Diffusion-SVC-pretrained-models/resolve/main/whisper_medium_vol_76830_k200.zip) |
-- **实验发现naive模型在小数据上有音域问题，请优先考虑用较少的步数微调naive模型或直接使用无限音域的ddsp模型**
-
-### 2.3 和2.2配套的Naive预训练模型和DDSP预训练模型
-| 所用编码器                                                                          | 网络大小  | 数据集               | 类型    | Naive模型下载                                                                                                                            |
-|--------------------------------------------------------------------------------|-------|-------------------|-------|--------------------------------------------------------------------------------------------------------------------------------------|
-| [contentvec768l12](https://ibm.ent.box.com/s/z1wgl1stco8ffooyatzdwsqn2psd9lrr) | 3*256 | VCTK<br/>m4singer | Naive | [HuggingFace](https://huggingface.co/datasets/ms903/Diff-SVC-refactor-pre-trained-model/resolve/main/Diffusion-SVC/naive/model_0.pt) |
-
-
-- **注意：naive预训练模型也可用于完整扩散模型的前级naive模型。且微调shallow模型时建议将配置文件中的`decay_step`改小(如10000)。**
 
 ### 3. 使用预训练数据（底模）进行训练：
 1. 欢迎PR训练的多人底模 (请使用授权同意开源的数据集进行训练)。
@@ -166,6 +139,8 @@ model:
 3. 将名为`model_0.pt`的预训练模型, 放到`config.yaml`里面 "expdir: exp/*****" 参数指定的模型导出文件夹内, 没有就新建一个, 程序会自动加载该文件夹下的预训练模型。
 4. 同不使用预训练数据进行训练一样，启动训练。
 
+### 4.我们提供的与训练模型
+看todo
 ## 4.1. Naive模型与组合模型
 ### Naive模型
 Naive模型是一个轻量级的svc模型，可以作为浅扩散的前级，训练方式与扩散模型一致，示例配置文件在`configs/config_naive.yaml`。其所需的预处理和扩散模型是一样的。
@@ -268,6 +243,7 @@ python flask_api.py
 | ONNX导出                       | ×             | 
 | 更好的语义编码器               | ×*             |
 | 更好的预处理               | √（实验性）     |
+| 预训练模型           | √（实验性）     |
 
 
 ## 感谢
