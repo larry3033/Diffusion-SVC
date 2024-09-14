@@ -1,19 +1,17 @@
-Language: [English](./README_en.md) **简体中文**
 
-# Diffusion-SVC
-[![Open in OpenXLab](https://cdn-static.openxlab.org.cn/app-center/openxlab_app.svg)](https://openxlab.org.cn/apps/detail/CNChiTu/DiffusionSVC-V1-Demo)
-[![Colab_CN](https://img.shields.io/static/v1?label=Colab&message=Notebook&color=F9AB00&logo=googlecolab&style=flat-square)](https://colab.research.google.com/github/CNChTu/Diffusion-SVC/blob/main/Diffusion_SVC_CN.ipynb)
-[![madewithlove](https://forthebadge.com/images/badges/built-with-love.svg)](https://github.com/CNChTu/Diffusion-SVC/)
-[![Discord](https://img.shields.io/discord/1044927142900809739?color=%23738ADB&label=Discord&style=for-the-badge)](https://discord.gg/jvA5c2xzSE)
 
-此仓库是[DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)仓库的扩散部分的单独存放。可单独训练和推理。
+### Diffusion-SVC
+
+
+~~此仓库是[DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)仓库的扩散部分的单独存放。可单独训练和推理。~~（V2不是啦）<br>
+欢迎来到SVC试验田
 ***
 **最近更新：使用本仓库的naive模型和浅扩散模型搭配可以用极低训练成本达到比单纯扩散模型更好的效果，强力推荐。但是小网络的naive模型泛化能力较弱，在小数据集上可能会有音域问题，这个时候naive模型微调不能训练太多步数(这会让底模退化)，前级也可以考虑更换为无限音域的ddsp模型。**
 <br>效果和介绍见[[介绍视频(暂未完成)]]()
 **欢迎加群交流讨论：882426004**
 ![Diagram](doc/diagram.jpg)
 ## 0.简介
-Diffusion-SVC 是[DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)仓库的扩散部分的单独存放。可单独训练和推理。
+Diffusion-SVC-V2 是由V1改进得来的。可单独训练和推理。
 
 相比于比较著名的 [Diff-SVC](https://github.com/prophesier/diff-svc), 本项目的显存占用少得多，训练和推理速度更快，并针对浅扩散和实时用途有专门优化。可以在较强的GPU上实时推理。配合本项目的naive模型进行浅扩散，即使是较弱的GPU也可以实时生成质量优秀的音频。
 
@@ -30,7 +28,8 @@ Diffusion-SVC 是[DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)仓库的扩散�
 
 2. 安装依赖
 ```bash
-pip install -r requirements.txt 
+pip install -r requirements.txt
+#对于Windows系统，你可能需要预先安装C++生成工具 
 ```
 
 ## 2. 配置预训练模型
