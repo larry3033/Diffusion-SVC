@@ -37,7 +37,7 @@ pip install -r requirements.txt
   - 注意：也可以使用别的特征提取，但仍然优先推荐ContentVec。支持的所有特征提取见`tools/tools.py`中的`Units_Encoder`类。下载链接见后文。
 - **(必要操作)** 从 [DiffSinger 社区声码器项目](https://openvpi.github.io/vocoders) 或者[Kouon-Vocoder 社区声码器项目](https://github.com/Kouon-Vocoder-Project)下载预训练声码器，并解压至 `pretrain/` 文件夹。
   -  注意：你应当下载名称中带有`nsf_hifigan`的压缩文件，而非`nsf_hifigan_finetune`。
-- ~~如果需要使用声纹模型，则需要将配置文件的`use_speaker_encoder`设置为`true`, 并从[这里](https://drive.google.com/drive/folders/15oeBYf6Qn1edONkVLXe82MzdIi3O_9m3?usp=sharing)下载预训练声纹模型,该模型来自[mozilla/TTS](https://github.com/mozilla/TTS/wiki/Released-Models)。~~
+- **(可选操作)**  从 [RMVPE](https://github.com/yxlllc/RMVPE/releases/download/230917/rmvpe.zip) 下载预训练rmvpe提取器并解压至 `pretrain/` 文件夹
 
 ## 3. 预处理
 
