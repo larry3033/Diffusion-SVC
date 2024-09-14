@@ -174,15 +174,6 @@ python main.py -i <input.wav> -model <model_ckpt.pt> -o <output.wav> -k <keychan
 python gui_realtime_reflow.py
 ```
 
-本项目也可配合[rtvc](https://github.com/fishaudio/realtime-vc-gui)实现实时推理。
-
-**注意：目前flask_api为实验性功能，rtvc也未完善，不推荐使用此方式。**
-
-```bash
-pip install rtvc
-python rtvc
-python flask_api.py
-```
 
 ## 9. 兼容性
 ### 9.1. Units编码器
@@ -204,7 +195,7 @@ python flask_api.py
 ## 11.Onnx导出
 ~~暂时不可用~~
 
-## 12.todo
+## 12.Todo
 |                               | 完成情况 | 
 |-------------------------------|---------------|
 | 易于用户使用的Gradio界面        | ×             | 
@@ -213,6 +204,15 @@ python flask_api.py
 | 更好的预处理               | √（实验性）     |
 | 预训练模型           | √（实验性）     |
 
+## 13.f0提取器
+| 预测器	| 优点 |	缺点 |
+|-------------------------------|---------------|---------------|
+| pm  |	速度快，占用低 |	容易出现哑音|
+| crepe |	基本不会出现哑音 |	显存占用高，自带均值滤波，因此可能会出现跑调|
+| dio |	-|	可能跑调 |
+| harvest |	低音部分有更好表现	| 其他音域就不如别的算法 |
+| rmvpe |	六边形战士，目前最完美的预测器	| 几乎没有缺点（极端长低音可能会出错）|
+| fcpe	| 吃土自研，目前最快的预测器，且有不输 crepe 的准确度 |	-|
 
 ## 感谢
 * [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
