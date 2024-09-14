@@ -127,8 +127,8 @@ model:
     ...
 ```
 ****
-#### ！！！！！！！！！推荐训练浅扩散模型+naive模型！！！！！！！！！
-只训练k_step_max深度的浅扩散模型与naive模型的组合比单纯完全扩散的质量可能还要更高，同时训练速度更快。但是naive模型可能存在音域问题。
+#### ！！！！！！！！！推荐训练带Reflow的模型！！！！！！！！！
+数据过差的话可能会炸
 ****
 
 ### 2.1 训练完整过程的扩散预训练模型 
@@ -256,16 +256,19 @@ python flask_api.py
 | WavLM(Base,Large)             | ×             | ×                                              | √*                                                             |
 
 ## 10. Colab
-可以使用[TheMandateOfRock](https://github.com/OOPPEENN)写的笔记`Diffusion_SVC_CN.ipynb`; 由于我没有条件测试，所以有关问题请向笔记作者反馈。~~(我摸了)~~
+~~暂时不可用~~
 
 ## 11.Onnx导出
-在exp文件夹下创建一个新文件夹(该文件夹的名字就是等会命令中的ProjectName)，将模型和配置文件放置入其中，模型重命名为model.pt，配置为config.yaml
+~~暂时不可用~~
 
-然后执行以下命令进行导出。
-```shell
-python diffusion/onnx_export.py --project <ProjectName>
-```
-导出完成之后会自动创建[MoeVS](https://github.com/NaruseMioShirakana/MoeVoiceStudio)的配置文件,感谢[NaruseMioShirakana](https://github.com/NaruseMioShirakana)(同时也是MoeVS的作者)提供的onnx导出支持。
+## 12.todo
+|                               | 完成情况 | 
+|-------------------------------|---------------|
+| 易于用户使用的Gradio界面        | ×             | 
+| ONNX导出                       | ×             | 
+| 更好的语义编码器               | ×*             |
+| 更好的预处理               | √（实验性）     |
+
 
 ## 感谢
 * [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
