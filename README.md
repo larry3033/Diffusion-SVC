@@ -155,15 +155,39 @@ tensorboard --logdir=exp
 ```bash
 python main.py -i <input.wav> -model <model_ckpt.pt> -o <output.wav> -k <keychange> -id <speaker_id> -speedup <speedup> -method <method> -kstep <kstep> -nmodel <nmodel> -pe <f0_extractor>
 ```
-`-model`是模型的路径，`-k`是变调， `-speedup`为加速倍速，`-method`为`pndm`,`ddim`,`unipc`或`dpm-solver`, `-kstep`为浅扩散步数，`-id`为扩散模型的说话人id。
+必须的参数：<br>
+`-model`模型路径
 
-如果`-kstep`不为空，则以输入源的 mel 进行浅扩散，若`-kstep`为空，则进行完整深度的高斯扩散。
+`-k` 变调,整数类型，数字为半音
 
-`-nmodel`(可选，需要单独训练)是naive模型的路径，用来提供一个大致的mel给扩散模型进行k_step深度的浅扩散，其参数需要与主模型匹配。
+`-id`全局使用的说话人id。多说话人必须，默认1
 
-`-pe` 可选项为 `crepe` `parselmouth` `dio` `harvest` `rmvpe` 默认 `crepe`  
+`-i` 输入音频路径
+
+`-o` 输出音频路径
+
+`-th` 响应阈值
+
+`-inferstep` reflow采样步数
+
+`-method` 可选`rk4` `euler`
 
 
+非必要参数：<br>
+
+`-pe` 使用的F0提取器可选 `crepe` `parselmouth` `dio` `harvest` `rmvpe`  `fcpe`   默认 `crepe`  
+
+`-d`使用的设备，可选`cpu` `cuda`，默认自动
+
+`-tstart` reflow部分处理多少前级输出结果
+
+
+已经被抛弃的参数和特性：<br>
+~~`-speedup`为加速倍速~~
+~~`-method`为`pndm``ddim`,`unipc`或`dpm-solver`~~
+~~`-kstep`浅扩散步数~~
+~~如果`-kstep`不为空，则以输入源的 mel 进行浅扩散，若`-kstep`为空，则进行完整深度的高斯扩散。~~
+~~`-nmodel`(可选，需要单独训练)是naive模型的路径，用来提供一个大致的mel给扩散模型进行k_step深度的浅扩散，其参数需要与主模型匹配。~~
 
 
 
