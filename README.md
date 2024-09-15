@@ -222,7 +222,7 @@ python gui_realtime_reflow.py
 ## 12.Todo
 |                               | 完成情况 | 
 |-------------------------------|---------------|
-| 易于用户使用的Gradio界面        | ×             | 
+| 易于用户使用的Gradio界面        | √（实验性）             | 
 | ONNX导出                       | ×             | 
 | 更好的语义编码器               | ×*             |
 | 更好的预处理               | √（实验性）     |
@@ -237,6 +237,18 @@ python gui_realtime_reflow.py
 | harvest |	低音部分有更好表现	| 其他音域就不如别的算法 |
 | rmvpe |	六边形战士，目前最完美的预测器	| 几乎没有缺点（极端长低音可能会出错）|
 | fcpe	| 吃土自研，目前最快的预测器，且有不输 crepe 的准确度 |	-|
+
+## 14.测试和更新区
+### 2024-9-15：
+
+```bash
+#打开训练webui
+python train_ui.py
+#打开推理webui
+python infer_ui.py
+```
+更新了get_val.py,不同于传统抽卡，此脚本为固定每个说话人数量抽卡
+
 
 ## 感谢
 * [DDSP-SVC](https://github.com/yxlllc/DDSP-SVC)
