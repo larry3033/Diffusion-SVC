@@ -4,14 +4,13 @@ import glob
 import yaml
 import shutil
 import subprocess
-import tqdm
 import librosa
 import soundfile as sf
-import scipy
 from slicer2 import Slicer
 import fnmatch
 from pydub import AudioSegment
 import concurrent.futures
+import random
 
 
 #检查目录存在性
@@ -29,11 +28,14 @@ if not os.path.exists("./workdir"):
 
 def main_ui():
     config_list=None
+    global text1
+    global title_markdown
     with gr.Blocks() as ui:
-        gr.Markdown('# Diffusion-SVC-Webui-1.0.0bate1')
-        
+        gr.Markdown('# Diffusion-SVC-Webui-1.0.0bate2')
+        gr.Markdown(title_markdown)
+        check_text=gr.Textbox(lines=1,interactive=True,label="状态指示器")
         with gr.Tab("创建工程"):
-            gr.Markdown('创建工程进度请关注控制台！！！工程创建成功后因故重启后端后只需要填入工程名 <br> 你需要把你的训练集手动放到workdir下的dataset_tmp里面')
+            gr.Markdown('创建工程进度请关注控制台！！！工程创建成功后因故重启后端后只需要填入工程名 <br> ')
             with gr.Row():
                 work_name=gr.Textbox(label="工程名",lines=1, placeholder="输入工程名",interactive=True)
             with gr.Row():    
@@ -43,17 +45,19 @@ def main_ui():
             with gr.Row():
                 create_wordir_bt=gr.Button(value='创建工程')
             get_all_config_list.click(fn=get_config_list,outputs=config_in_create_config)
-            create_wordir_bt.click(fn=create_wordir,inputs=[config_in_create_config,work_name])
+            create_wordir_bt.click(fn=create_wordir,inputs=[config_in_create_config,work_name],outputs=check_text)
         with gr.Tab("训练/微调"):
             with gr.Tab("数据预处理"):
+                gr.Markdown(text1)
                 with gr.Row():
                     audio_process_bt=gr.Button(value='开始数据前置处理')
                 with gr.Row():
                     process_f0=gr.Dropdown(['parselmouth', 'dio', 'harvest', 'crepe','rmvpe','fcpe'],type='value',value='rmvpe',label='f0提取器种类',interactive=True)
                 with gr.Row():    
                     bt_auto_process_start=gr.Button(value='开始正式预处理')
-                audio_process_bt.click(fn=audio_process,inputs=[work_name])
-                bt_auto_process_start.click(fn=audio_process_all,inputs=[work_name,process_f0])
+                audio_process_bt.click(fn=audio_process,inputs=[work_name],outputs=check_text)
+                bt_auto_process_start.click(fn=audio_process_all,inputs=[work_name,process_f0],outputs=check_text)
+                
             with gr.Tab("训练"):
                 gr.Markdown('这里的配置项目修改不全，请自行修改你工程目录下的配置文件<br>如果需要底模，请自行放入工程下的exp/diffusionsvc内')
                 
@@ -76,9 +80,12 @@ def main_ui():
                 with gr.Row():    
                     bt_train_config=gr.Button(value='写入配置文件')
                     bt_train=gr.Button(value='开始训练')
+                
 
-                bt_train_config.click(fn=change_train_config,inputs=[num_workers,amp_dtype,batch_size,learning_rate,decay_step,cache_device,cache_all_data,interval_log,val,save,gamma,work_name])
+
+                bt_train_config.click(fn=change_train_config,inputs=[num_workers,amp_dtype,batch_size,learning_rate,decay_step,cache_device,cache_all_data,interval_log,val,save,gamma,work_name],outputs=check_text)
                 bt_train.click(fn=train,inputs=[work_name])
+                
     ui.launch(inbrowser=True)
 
 
@@ -87,6 +94,9 @@ def main_ui():
 def train(dir_name):
     config_path="./workdir/"+dir_name+'/config.yaml'
     subprocess.run('start cmd /k python -u train.py -c '+config_path,shell=True,stdout=subprocess.PIPE)
+    
+
+
 
 
 
@@ -116,6 +126,7 @@ def change_train_config(num_workers,amp_dtype,batch_size,lr,decay_step,cache_dev
 
     with open("./workdir/"+dir_name+'/config.yaml', "w") as ref:
         yaml.dump(existing_config, ref)
+    return gr.update(value='配置文件写入完成')
 
 
 
@@ -130,7 +141,8 @@ def audio_process_all(dir_name,process_f0):
             yaml.dump(data,f)
     config_path="./workdir/"+dir_name+'/config.yaml'
      
-    subprocess.run('start cmd /k python -u preprocess.py -c '+config_path,shell=True,stdout=subprocess.PIPE)    
+    subprocess.run('start cmd /k python -u preprocess.py -c '+config_path,shell=True,stdout=subprocess.PIPE)
+    return gr.update(value='预处理完成')    
     
 
 
@@ -154,6 +166,7 @@ def audio_process(dir_name):
     if not os.path.exists('./workdir/'+dir_name+'/data/val/audio'):
         os.makedirs('./workdir/'+dir_name+'/data/val/audio')
     move_files_with_structure('./workdir/'+dir_name+'/data/train/audio', './workdir/'+dir_name+'/data/val/audio', 2)
+    return gr.update(value='数据前置处理完毕')
 
 
 
@@ -187,9 +200,11 @@ def create_wordir(config_name,dir_name):
             yaml.dump(data, file, default_flow_style=False)
         os.makedirs("./workdir/"+dir_name+'/data')
         os.makedirs("./workdir/"+dir_name+'/dataset_tmp')
+        os.makedirs("./workdir/"+dir_name+'/exp/diffusionsvc')
         #print('开始创建训练所需的文件，这一步可能耗时较长（取决于硬盘）')
         #shutil.copy('./dataset_raw', "./workdir/"+dir_name+'/dataset_tmp')
         print('工程创建完成')
+        return gr.update(value='工程创建完成，可以放置数据集和底模')
 
 
 
@@ -395,9 +410,35 @@ def move_files_with_structure(src_dir, dst_dir, num_files=1):
             moved_count += 1
 
 
+title_list = ['就像种子会明白要茁壮成长，变成大树，然后结出饱满的果实。', '太可惜了。无论是多点什么还是少点什么，有变化才会让人变得更好，不是吗?', '你会比我们走得更远，你们会战胜我们没能跨越的阻碍。', '即便心中仍有迷惘，也不必惊慌，你仍有很多时间将其细细咀嚼。', '愿文明，如星火般延续。愿此世，如黄金般辉煌。','在残酷的现实中，在利益至上的世界里，我只会变成一块软弱的海绵，被动地吸收着所有的恶意。当我被污水污染殆尽，我就被人们丢弃，我再也没有精力与热情向人们表达真诚的善意','有时我会思考，你我的灵魂能否共鸣，你我的心跳能否同频。我与你的指尖仿佛就相隔一层薄薄的纸，却成为我一辈子无法逾越的屏障。我起初妄想能够轻易地打碎这道屏障，后来又跪伏在屏障之下乞求你的垂怜。','我的未来如同梦境，你则是梦境里的意识体。当未来成为一个谎言，难怪你的形象会变得稀薄。','这一刻我意识到一切即将无法挽回。我清醒地意识到自己正在走向虚无，虚无的黑洞向我张开怀抱，我仿佛正在落入它的事件视界，我仿佛已经预感到，当我落入虚无的深渊，我会看到我短暂又快速消逝的一生。',' 你就像我不顾一切都要拥抱的全部，可是你又是一道不停飘摇怎么也对不准的电波。我知道这不是你的躲避或玩弄，只是命运写死的残酷现实。','当你为错过太阳而哭泣的时候，你也要错过群星了。','有一个夜晚，我烧毁了所有的记忆，从此我的梦就透明了。有一个早晨，我扔掉了所有的昨天，从此，我的脚步就轻盈了。','迷茫的时候，就抬头看看星空吧，我愿在那里，为你照亮整片黑夜。','愿你前行的道路有群星闪耀，愿你留下的足迹有百花绽放，你即是上帝的馈赠，世界因你而瑰丽','一份曾经的存在，催生出了新的生命，而她又将以这份存在为基石，在这个世界上继续前行，这或许就是人类称之为进化的旅途','你已选择了自己的道途，那就必须前往这条路的尽头，迷惘者跟随英雄的余晖，而他们也是英雄得前进的道标']
+selected_item = random.choice(title_list)
+title_markdown=selected_item
+
+text1='''
+**所有说话人目录下不应该有任何子目录**
+- 目录结构：
+
+```
+workdir
+│
+│    ├─ dataset_tmp
+│    │    ├─ spk1
+│    │    │   ├─ aaa.wav
+│    │    │   ├─ bbb.wav
+│    │    │   └─ ....wav
+│    │    ├─ spk1
+│    │    │   ├─ ccc.wav
+│    │    │   ├─ ddd.wav
+│    │    │   └─ ....wav
+│    │    └─ ...
+│
+├─exp
+├─data
 
 
-
+```
+**看懂训练集音频怎么放了吗？什么你说你没看懂？罚你回去看视频**
+'''
 
 
 main_ui()
